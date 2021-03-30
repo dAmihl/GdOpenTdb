@@ -4,7 +4,6 @@ using Godot.Collections;
 
 public class OpenTdbHTTP : HTTPRequest
 {
-
     public const String OpenTDB_BASE_URL = "https://opentdb.com/";
 
     [Export] public EEncoding apiEncoding;
@@ -13,6 +12,7 @@ public class OpenTdbHTTP : HTTPRequest
 
     [Signal]
     public delegate void QuestionsLoaded(Array<Question> questions);
+    public delegate void QuestionsLoadError(String errorMessage);
 
     public enum EEncoding
     {
@@ -141,7 +141,7 @@ public class OpenTdbHTTP : HTTPRequest
         {
             url += "&encoding=" + encoding;
         }
-        GD.Print("Fetching from URL: " + url);
+        GD.Print("[GdOpenTdb] Fetching from URL: " + url);
         var error = this.Request(url, customHeaders, validateSsl, HTTPClient.Method.Get);
         if (error != Error.Ok)
         {
@@ -151,7 +151,7 @@ public class OpenTdbHTTP : HTTPRequest
 
     private void OnTriviaRequestComplete(Result result, int response_code, string[] headers, byte[] body)
     {
-        GD.Print("Load Success!");
+        GD.Print("[GdOpenTdb] Loading Questions success!");
         var jsonStr = System.Text.Encoding.UTF8.GetString(body);
         JSONParseResult dict = JSON.Parse(jsonStr);
         
@@ -194,6 +194,8 @@ public class OpenTdbHTTP : HTTPRequest
 
     private void OnTriviaRequestError(Error e)
     {
-        GD.Print(e);
+        String ErrorMsg = "[GdOpenTdb] Error loading Questions from OpenTDB. Error: " + e;
+        GD.PrintErr(ErrorMsg);
+        EmitSignal(nameof(QuestionsLoadError), ErrorMsg);
     }
 }
