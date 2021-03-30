@@ -38,14 +38,17 @@ public class OpenTdbHTTP : HTTPRequest
         {
             Dictionary parsed = dict.Result as Dictionary;
             Godot.Collections.Array results = parsed["results"] as Godot.Collections.Array;
+            
             foreach (Dictionary r in results)
             {
-                GD.Print(CreateFromJsonResult(r));
+                GD.Print(r);
+                //GD.Print(CreateFromJsonResult(r));
             }
         }
     }
 
     // {category:Geography, correct_answer:False, difficulty:easy, incorrect_answers:[True], question:Greenland is covered with grass and Iceland covered with ice., type:boolean}
+    // {category:Entertainment: Video Games, correct_answer:The Hotshot, difficulty:medium, incorrect_answers:[The Discard, The Elephant, The Mohawk], question:In WarioWare: Smooth Moves, which one of these is NOT a Form?, type:multiple}
 
     private Question CreateFromJsonResult(Dictionary res)
     {
@@ -54,6 +57,8 @@ public class OpenTdbHTTP : HTTPRequest
         newQ.questionString = res["question"] as String;
         newQ.typeString = res["type"] as String;
         newQ.difficultyString = res["difficulty"] as String;
+        newQ.questionDifficulty = Question.GetDifficultyFromString(res["difficulty"] as String);
+        newQ.questionType = Question.GetTypeFromString(res["type"] as String);
         return newQ;
     }
 
