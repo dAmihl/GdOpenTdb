@@ -6,7 +6,7 @@ public class Question : Godot.Object
 
     public enum Type
     {
-        BOOLEAN,
+        TRUE_FALSE,
         MULTIPLE_CHOICE
     }
 
@@ -24,25 +24,20 @@ public class Question : Godot.Object
     public string typeString { set; get; } = "boolean";
     public string difficultyString { set; get; } = "easy";
 
-
-    public Type questionType { set; get; } = Type.BOOLEAN;
+    public Type questionType { set; get; } = Type.TRUE_FALSE;
     public Difficulty questionDifficulty { set; get; } = Difficulty.EASY;
 
-    public static Question createFromResult(Array res)
-    {
-        Question q = new Question();
-        return q;
-        //q.questionString = res["question"];
-    }
+    public String correctAnswer { set; get; }
+    public String[] wrongAnswers { set; get; }
 
     public static Type GetTypeFromString(String typeString)
     {
-        if (typeString.Equals("boolean"))
+        if (typeString.Equals(OpenTdbHTTP.Type.TrueFalse))
         {
-            return Type.BOOLEAN;
+            return Type.TRUE_FALSE;
         }
 
-        if (typeString.Equals("multiple"))
+        if (typeString.Equals(OpenTdbHTTP.Type.MultipleChoice))
         {
             return Type.MULTIPLE_CHOICE;
         }
@@ -52,21 +47,26 @@ public class Question : Godot.Object
 
     public static Difficulty GetDifficultyFromString(String difficultyString)
     {
-        if (difficultyString.Equals("easy"))
+        if (difficultyString.Equals(OpenTdbHTTP.Difficulty.Easy))
         {
             return Difficulty.EASY;
         }
         
-        if (difficultyString.Equals("medium"))
+        if (difficultyString.Equals(OpenTdbHTTP.Difficulty.Medium))
         {
             return Difficulty.MEDIUM;
         }
-        if (difficultyString.Equals("hard"))
+        if (difficultyString.Equals(OpenTdbHTTP.Difficulty.Hard))
         {
             return Difficulty.HARD;
         }
 
         return Difficulty.HARD;
+    }
+
+    public override string ToString()
+    {
+        return "Question: [" + questionString + "] in Category [" + category + "]";
     }
 
 }

@@ -7,17 +7,139 @@ public class OpenTdbHTTP : HTTPRequest
 
     public const String OpenTDB_BASE_URL = "https://opentdb.com/";
 
+    [Export] public EEncoding apiEncoding;
+    [Export] public EType apiType;
+    [Export] public EDifficulty apiDifficulty;
+
+    public enum EEncoding
+    {
+        Default,
+        UrlLegacy,
+        Url3986,
+        Base64
+    }
+
+    public enum EDifficulty
+    {
+        All,
+        Easy,
+        Medium,
+        Hard
+    }
+
+    public enum EType
+    {
+        All,
+        TrueFalse,
+        MultipleChoice
+    }
+
+    public static class Encoding
+    {
+        public static String Default { get { return null; } }
+        public static String UrlLegacy { get { return "urlLegacy"; } }
+        public static String Url3986 { get { return "url3986"; } }
+        public static String Base64 { get { return "base64"; } }
+
+        public static String GetFromEnum(EEncoding e)
+        {
+            switch (e)
+            {
+                case EEncoding.UrlLegacy:
+                    return UrlLegacy;
+                case EEncoding.Url3986:
+                    return Url3986;
+                case EEncoding.Base64:
+                    return Base64;
+                case EEncoding.Default:
+                    return Default;
+                default:
+                    return null;
+            }
+        }
+    }
+
+    public static class Difficulty
+    {
+        public static String Easy { get { return "easy"; } }
+        public static String Medium { get { return "medium"; } }
+        public static String Hard { get { return "hard"; } }
+
+        public static String GetFromEnum(EDifficulty d)
+        {
+            switch (d)
+            {
+                case EDifficulty.Medium: 
+                    return Medium;
+                case EDifficulty.Hard: 
+                    return Hard;
+                case EDifficulty.Easy:
+                    return Easy;
+                case EDifficulty.All:
+                    return null;
+                default:
+                    return null;
+            }
+        }
+    }
+
+    public static class Type
+    {
+        public static String MultipleChoice { get { return "multiple";  } }
+        public static String TrueFalse { get { return "boolean";  } }
+
+        public static String GetFromEnum(EType t)
+        {
+            switch (t)
+            {
+                case EType.MultipleChoice: 
+                    return MultipleChoice;
+                case EType.TrueFalse:
+                    return TrueFalse;
+                case EType.All:
+                    return null;
+                default:
+                    return null;
+            }
+        }
+    }
+
 
     public override void _Ready()
     {
         this.Connect("request_completed", this, "OnTriviaRequestComplete");
     }
 
-    public void LoadTriviaQuestions()
+    public void LoadTriviaQuestions(int amount)
+    {
+        FetchTriviaQuestions(amount, null, Difficulty.GetFromEnum(apiDifficulty), Type.GetFromEnum(apiType), Encoding.GetFromEnum(apiEncoding) );
+    }
+
+    private void FetchTriviaQuestions(int amount, String category = null, String difficulty = null, String type = null, String encoding = null)
     {
         string[] customHeaders = null;
         var validateSsl = true;
-        var error = this.Request(OpenTDB_BASE_URL + "api.php?amount=10", customHeaders, validateSsl, HTTPClient.Method.Get);
+
+        String baseUrl = OpenTDB_BASE_URL + "api.php";
+        String url = baseUrl + "?amount=" + amount;
+        if (difficulty != null)
+        {
+            url += "&difficulty=" + difficulty;
+        }
+        if (category != null)
+        {
+            url += "&category=" + category;
+        }
+        if (type != null)
+        {
+            url += "&type=" + type;
+        }
+        if (encoding != null)
+        {
+            url += "&encoding=" + encoding;
+        }
+        GD.Print("Fetching from URL: " + url);
+        var error = this.Request(url, customHeaders, validateSsl, HTTPClient.Method.Get);
         if (error != Error.Ok)
         {
             OnTriviaRequestError(error);
@@ -41,8 +163,7 @@ public class OpenTdbHTTP : HTTPRequest
             
             foreach (Dictionary r in results)
             {
-                GD.Print(r);
-                //GD.Print(CreateFromJsonResult(r));
+                GD.Print(CreateFromJsonResult(r));
             }
         }
     }
@@ -59,6 +180,8 @@ public class OpenTdbHTTP : HTTPRequest
         newQ.difficultyString = res["difficulty"] as String;
         newQ.questionDifficulty = Question.GetDifficultyFromString(res["difficulty"] as String);
         newQ.questionType = Question.GetTypeFromString(res["type"] as String);
+        newQ.wrongAnswers = res["incorrect_answers"] as String[];
+        newQ.correctAnswer = res["correct_answer"] as String;
         return newQ;
     }
 
