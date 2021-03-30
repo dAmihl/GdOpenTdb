@@ -12,6 +12,7 @@ public class OpenTdbHTTP : HTTPRequest
 
     [Signal]
     public delegate void QuestionsLoaded(Array<Question> questions);
+    [Signal]
     public delegate void QuestionsLoadError(String errorMessage);
 
     public enum EEncoding
