@@ -11,6 +11,9 @@ public class OpenTdbHTTP : HTTPRequest
     [Export] public EType apiType;
     [Export] public EDifficulty apiDifficulty;
 
+    [Signal]
+    public delegate void QuestionsLoaded(Array<Question> questions);
+
     public enum EEncoding
     {
         Default,
@@ -160,11 +163,15 @@ public class OpenTdbHTTP : HTTPRequest
         {
             Dictionary parsed = dict.Result as Dictionary;
             Godot.Collections.Array results = parsed["results"] as Godot.Collections.Array;
-            
+
+            Array<Question> ParsedQuestions = new Array<Question>();
+
             foreach (Dictionary r in results)
             {
-                GD.Print(CreateFromJsonResult(r));
+                ParsedQuestions.Add(CreateFromJsonResult(r));
             }
+
+            EmitSignal(nameof(QuestionsLoaded), ParsedQuestions);
         }
     }
 
