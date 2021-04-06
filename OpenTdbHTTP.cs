@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Godot.Collections;
+using Array = Godot.Collections.Array;
 
 public class OpenTdbHTTP : HTTPRequest
 {
@@ -188,7 +189,13 @@ public class OpenTdbHTTP : HTTPRequest
         newQ.difficultyString = res["difficulty"] as String;
         newQ.questionDifficulty = Question.GetDifficultyFromString(res["difficulty"] as String);
         newQ.questionType = Question.GetTypeFromString(res["type"] as String);
-        newQ.wrongAnswers = res["incorrect_answers"] as String[];
+        Array wrongAnswers = res["incorrect_answers"] as Array;
+        Array<String> waS = new Array<string>();
+        foreach (var wa in wrongAnswers)
+        {
+            waS.Add(wa as String);
+        }
+        newQ.wrongAnswers = waS;
         newQ.correctAnswer = res["correct_answer"] as String;
         return newQ;
     }

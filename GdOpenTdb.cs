@@ -10,8 +10,8 @@ public class GdOpenTdb : EditorPlugin
         base._EnterTree();
         var path = (GetScript() as Resource).ResourcePath.GetBaseDir();
         var script = ResourceLoader.Load(path + "/OpenTdbHTTP.cs") as Script;
-        var iconTex = ResourceLoader.Load(path + "/icon.png") as Texture;
-        AddCustomType("OpenTdb", "HTTPRequest", script, iconTex);
+        //var iconTex = ResourceLoader.Load(path + "/icon.png") as Texture;
+        AddCustomType("OpenTdb", "HTTPRequest", script, null);
     }
 
     public override void _ExitTree()

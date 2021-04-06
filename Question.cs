@@ -1,6 +1,7 @@
 using Godot;
+using Godot.Collections;
 using System;
-
+using Array = Godot.Collections.Array;
 public class Question : Godot.Object
 {
 
@@ -28,7 +29,7 @@ public class Question : Godot.Object
     public Difficulty questionDifficulty { set; get; } = Difficulty.EASY;
 
     public String correctAnswer { set; get; }
-    public String[] wrongAnswers { set; get; }
+    public Array<String> wrongAnswers { set; get; }
 
     public static Type GetTypeFromString(String typeString)
     {
