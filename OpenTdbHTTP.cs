@@ -2,6 +2,7 @@ using Godot;
 using System;
 using Godot.Collections;
 using Array = Godot.Collections.Array;
+using System.Net;
 
 public class OpenTdbHTTP : HTTPRequest
 {
@@ -141,7 +142,7 @@ public class OpenTdbHTTP : HTTPRequest
         }
         if (encoding != null)
         {
-            url += "&encoding=" + encoding;
+            url += "&encode=" + encoding;
         }
         GD.Print("[GdOpenTdb] Fetching from URL: " + url);
         var error = this.Request(url, customHeaders, validateSsl, HTTPClient.Method.Get);
@@ -184,7 +185,7 @@ public class OpenTdbHTTP : HTTPRequest
     {
         Question newQ = new Question();
         newQ.category = res["category"] as String;
-        newQ.questionString = res["question"] as String;
+        newQ.questionString = WebUtility.HtmlDecode(res["question"] as String);
         newQ.typeString = res["type"] as String;
         newQ.difficultyString = res["difficulty"] as String;
         newQ.questionDifficulty = Question.GetDifficultyFromString(res["difficulty"] as String);
@@ -193,10 +194,10 @@ public class OpenTdbHTTP : HTTPRequest
         Array<String> waS = new Array<string>();
         foreach (var wa in wrongAnswers)
         {
-            waS.Add(wa as String);
+            waS.Add(WebUtility.HtmlDecode(wa as String));
         }
         newQ.wrongAnswers = waS;
-        newQ.correctAnswer = res["correct_answer"] as String;
+        newQ.correctAnswer = WebUtility.HtmlDecode(res["correct_answer"] as String);
         return newQ;
     }
 
